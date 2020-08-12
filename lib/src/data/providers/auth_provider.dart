@@ -33,7 +33,7 @@ class AuthProvider extends BaseProvider {
 
     // In case phone verification completed required
     final phoneVerificationCompleted = (AuthCredential authCredential) async {
-      bool authResult = await _authWithCredential(authCredential);
+      bool authResult = await authWithCredential(authCredential);
 
       if (authResult) {
         verifyStream.add(kVComplete);
@@ -79,10 +79,10 @@ class AuthProvider extends BaseProvider {
     AuthCredential authCredential =
         PhoneAuthProvider.getCredential(verificationId: verID, smsCode: otp);
 
-    return _authWithCredential(authCredential);
+    return authWithCredential(authCredential);
   }
 
-  Future<bool> _authWithCredential(AuthCredential credential) async {
+  Future<bool> authWithCredential(AuthCredential credential) async {
     try {
       AuthResult result = await auth.signInWithCredential(credential);
       if (result.user != null) {
