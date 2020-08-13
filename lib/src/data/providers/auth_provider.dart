@@ -6,10 +6,16 @@ import 'package:firebase_auth_manager/src/auth_utilities.dart';
 import 'package:firebase_auth_manager/src/data/providers/base_provider.dart';
 
 class AuthProvider extends BaseProvider {
-  AuthProvider({FirebaseAuth firebaseAuth})
-      : auth = firebaseAuth ?? FirebaseAuth.instance;
+  static final AuthProvider _provider = AuthProvider._internal();
 
-  final FirebaseAuth auth;
+  factory AuthProvider({FirebaseAuth firebaseAuth}) {
+    _provider.auth = firebaseAuth ?? FirebaseAuth.instance;
+    return _provider;
+  }
+
+  AuthProvider._internal();
+
+  FirebaseAuth auth;
   String verID = "";
 
   Future<bool> isUserSigned() async {
