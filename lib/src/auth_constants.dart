@@ -6,3 +6,5 @@ const int kVFailed = 1;
 const int kVCodeSent = 2;
 // Entered phone number not valid
 const int kNotValidPhoneNo = 3;
+// Initial state
+const int kInitialVerifyPhone = 4;

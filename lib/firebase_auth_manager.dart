@@ -1,7 +1,1 @@
-library firebase_auth_manager;
-
-/// A Calculator.
-class Calculator {
-  /// Returns [value] plus 1.
-  int addOne(int value) => value + 1;
-}
+export 'src/widgets/phone_login_widget.dart';

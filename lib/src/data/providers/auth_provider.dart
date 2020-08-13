@@ -18,6 +18,9 @@ class AuthProvider extends BaseProvider {
   FirebaseAuth auth;
   String verID = "";
 
+  // Streams
+  StreamController<int> verifyStream = StreamController.broadcast();
+
   Future<bool> isUserSigned() async {
     return await auth.currentUser() != null;
   }
@@ -26,15 +29,14 @@ class AuthProvider extends BaseProvider {
 
   Future<void> signOut() => auth.signOut();
 
-  Stream<int> verifyPhoneNumber(String phoneNo) async* {
-    StreamController<int> verifyStream = StreamController();
+  Future<void> verifyPhoneNumber(String phoneNo) async {
     // first check if the user entered a valid phone number
     bool isValidPhone = isValidPhoneNumber(phoneNo);
 
     // if not method yield a not valid phone.
     if (!isValidPhone) {
       verifyStream.add(kNotValidPhoneNo);
-      verifyStream.close();
+      //verifyStream.close();
     }
 
     // In case phone verification completed required
@@ -46,14 +48,14 @@ class AuthProvider extends BaseProvider {
       } else {
         verifyStream.add(kVFailed);
       }
-      verifyStream.close();
+      //verifyStream.close();
     };
 
     // In case phone verification failed
     final phoneVerificationFailed = (AuthException exception) {
       print('== Auth failed with exception \n ${exception.message}');
       verifyStream.add(kVFailed);
-      verifyStream.close();
+      //verifyStream.close();
     };
 
     // When OTP sent to the user device
@@ -65,7 +67,7 @@ class AuthProvider extends BaseProvider {
     // When the timeout reached without receiving OTP
     final phoneCodeAutoRetrievalTimeout = (String verId) {
       this.verID = verId;
-      verifyStream.close();
+      //verifyStream.close();
     };
 
     // Calling verifyPhoneNumber
@@ -76,8 +78,6 @@ class AuthProvider extends BaseProvider {
         verificationFailed: phoneVerificationFailed,
         codeSent: otpSent,
         codeAutoRetrievalTimeout: phoneCodeAutoRetrievalTimeout);
-
-    yield* verifyStream.stream;
   }
 
   Future<bool> authByPhoneNumber(String otp) async {
@@ -105,6 +105,6 @@ class AuthProvider extends BaseProvider {
 
   @override
   void dispose() {
-    // dispose
+    verifyStream.close();
   }
 }
