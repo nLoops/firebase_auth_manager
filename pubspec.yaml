@@ -11,8 +11,10 @@ dependencies:
   flutter:
     sdk: flutter
 
-  # Firebase auth package
+  # Firebase auth package.
   firebase_auth: ^0.16.1
+  # General Utilities Package to show snackbar and loading indicators.
+  general_utilities: ^0.0.6+1
 
 dev_dependencies:
   flutter_test:
