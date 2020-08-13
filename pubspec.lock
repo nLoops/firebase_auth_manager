@@ -107,6 +107,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  general_utilities:
+    dependency: "direct main"
+    description:
+      name: general_utilities
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.6+1"
   http:
     dependency: transitive
     description:

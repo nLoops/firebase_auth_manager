@@ -47,15 +47,6 @@ void main() {
     });
   });
 
-  test('When enter wrong or not valid phone number stream return its CODE',
-      () async {
-    int result = await provider.verifyPhoneNumber('054902283').first;
-    expect(result, equals(kNotValidPhoneNo));
-
-    result = await provider.verifyPhoneNumber('++966549022834').first;
-    expect(result, equals(kNotValidPhoneNo));
-  });
-
   group('Auth with credential', () {
     final AuthCredential authCredential = MockAuthCredential();
     test('When auth result has no user return false', () async {

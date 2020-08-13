@@ -12,18 +12,18 @@ void main() {
     expect(_result, equals(false));
   });
 
-  test('When user enter phone number starting with + and shorter than max length validator return false', (){
-    bool _result = isValidPhoneNumber('+9665490');
+  test('When user enter number starting with 0 return false', (){
+    bool _result = isValidPhoneNumber('0549022834');
+    expect(_result, equals(false));
+  });
+  
+  test('When user enter number without country code according to E.164', (){
+    bool _result = isValidPhoneNumber('00966549022834');
     expect(_result, equals(false));
   });
 
-  test('When user enter valid phone number starting with + validator return true', (){
+  test('When user enter valid number with country code according to E.164', (){
     bool _result = isValidPhoneNumber('+966549022834');
-    expect(_result, equals(true));
-  });
-
-  test('When user enter valid phone number starting with 0 validator return true', (){
-    bool _result = isValidPhoneNumber('0549022834');
     expect(_result, equals(true));
   });
 }
