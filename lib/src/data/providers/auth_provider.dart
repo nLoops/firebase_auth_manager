@@ -37,47 +37,47 @@ class AuthProvider extends BaseProvider {
     if (!isValidPhone) {
       verifyStream.add(kNotValidPhoneNo);
       //verifyStream.close();
-    }
+    } else {
+      // In case phone verification completed required
+      final phoneVerificationCompleted = (AuthCredential authCredential) async {
+        bool authResult = await authWithCredential(authCredential);
 
-    // In case phone verification completed required
-    final phoneVerificationCompleted = (AuthCredential authCredential) async {
-      bool authResult = await authWithCredential(authCredential);
+        if (authResult) {
+          verifyStream.add(kVComplete);
+        } else {
+          verifyStream.add(kVFailed);
+        }
+        //verifyStream.close();
+      };
 
-      if (authResult) {
-        verifyStream.add(kVComplete);
-      } else {
+      // In case phone verification failed
+      final phoneVerificationFailed = (AuthException exception) {
+        print('== Auth failed with exception \n ${exception.message}');
         verifyStream.add(kVFailed);
-      }
-      //verifyStream.close();
-    };
+        //verifyStream.close();
+      };
 
-    // In case phone verification failed
-    final phoneVerificationFailed = (AuthException exception) {
-      print('== Auth failed with exception \n ${exception.message}');
-      verifyStream.add(kVFailed);
-      //verifyStream.close();
-    };
+      // When OTP sent to the user device
+      final otpSent = (String verId, [int forceResent]) {
+        this.verID = verId;
+        verifyStream.add(kVCodeSent);
+      };
 
-    // When OTP sent to the user device
-    final otpSent = (String verId, [int forceResent]) {
-      this.verID = verId;
-      verifyStream.add(kVCodeSent);
-    };
+      // When the timeout reached without receiving OTP
+      final phoneCodeAutoRetrievalTimeout = (String verId) {
+        this.verID = verId;
+        verifyStream.close();
+      };
 
-    // When the timeout reached without receiving OTP
-    final phoneCodeAutoRetrievalTimeout = (String verId) {
-      this.verID = verId;
-      //verifyStream.close();
-    };
-
-    // Calling verifyPhoneNumber
-    await auth.verifyPhoneNumber(
-        phoneNumber: phoneNo,
-        timeout: const Duration(seconds: 1),
-        verificationCompleted: phoneVerificationCompleted,
-        verificationFailed: phoneVerificationFailed,
-        codeSent: otpSent,
-        codeAutoRetrievalTimeout: phoneCodeAutoRetrievalTimeout);
+      // Calling verifyPhoneNumber
+      await auth.verifyPhoneNumber(
+          phoneNumber: phoneNo,
+          timeout: const Duration(seconds: 1),
+          verificationCompleted: phoneVerificationCompleted,
+          verificationFailed: phoneVerificationFailed,
+          codeSent: otpSent,
+          codeAutoRetrievalTimeout: phoneCodeAutoRetrievalTimeout);
+    }
   }
 
   Future<bool> authByPhoneNumber(String otp) async {
