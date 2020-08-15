@@ -1,5 +1,6 @@
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:firebase_auth_manager/src/auth_constants.dart';
+import 'package:firebase_auth_manager/src/auth_utilities.dart';
 import 'package:firebase_auth_manager/src/data/providers/auth_provider.dart';
 import 'package:firebase_auth_manager/src/widgets/otp_widget.dart';
 import 'package:flutter/material.dart';
@@ -33,6 +34,7 @@ class PhoneLoginWidget extends StatefulWidget {
 }
 
 class _PhoneLoginWidgetState extends State<PhoneLoginWidget> {
+  var _scaffoldKey = new GlobalKey<ScaffoldState>();
   final AuthProvider _provider = AuthProvider();
   final TextEditingController _phoneController = TextEditingController();
 
@@ -47,20 +49,23 @@ class _PhoneLoginWidgetState extends State<PhoneLoginWidget> {
 
     _provider.verifyStream.stream.listen((state) {
       if (state == kNotValidPhoneNo) {
-        SnackBarWidget.show(context, widget.notValidNumberMsg);
+        _scaffoldKey.currentState
+            .showSnackBar(getSnackBar(widget.notValidNumberMsg));
       }
 
       if (state == kVFailed) {
-        SnackBarWidget.show(context, widget.failedToAuthMsg);
+        _scaffoldKey.currentState
+            .showSnackBar(getSnackBar(widget.failedToAuthMsg));
       }
 
       if (state == kVComplete) {
-        SnackBarWidget.show(context, widget.authCompletedMsg);
+        _scaffoldKey.currentState
+            .showSnackBar(getSnackBar(widget.authCompletedMsg));
       }
 
       if (state == kVCodeSent) {
-        SnackBarWidget.show(context, widget.codeSentToTheDeviceMsg);
-
+        _scaffoldKey.currentState
+            .showSnackBar(getSnackBar(widget.codeSentToTheDeviceMsg));
         Navigator.of(context).pushReplacement(MaterialPageRoute(
             builder: (_) => _OtpInputWidget(
                   authCompletedMsg: widget.authCompletedMsg,
@@ -82,6 +87,7 @@ class _PhoneLoginWidgetState extends State<PhoneLoginWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       body: Container(
         constraints: BoxConstraints.expand(),
         padding: EdgeInsets.symmetric(horizontal: kDimenNormal),
@@ -175,6 +181,14 @@ class _PhoneLoginWidgetState extends State<PhoneLoginWidget> {
     }
     return _countryCode + _phone;
   }
+
+  SnackBar getSnackBar(String content) {
+    return SnackBar(
+      content: Text(content),
+      duration: const Duration(seconds: 2),
+      behavior: SnackBarBehavior.floating,
+    );
+  }
 }
 
 class _OtpInputWidget extends StatefulWidget {
@@ -223,45 +237,48 @@ class __OtpInputWidgetState extends State<_OtpInputWidget> {
     );
   }
 
-  SingleChildScrollView buildWidgetBody(BuildContext context, int fieldsCount, double otpWidth, double otpFieldWidth) {
+  SingleChildScrollView buildWidgetBody(BuildContext context, int fieldsCount,
+      double otpWidth, double otpFieldWidth) {
     return SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            _AppBarWidget(),
-            SizedBox(
-                width: 200.0,
-                height: 200.0,
-                child: Image(image: widget.logo)),
-            SpaceWidget(),
-            Text(
-              'Verification code',
-              style: Theme.of(context).textTheme.headline6,
-              textAlign: TextAlign.center,
-            ),
-            SpaceWidget(
-              space: kDimenSmall,
-            ),
-            Text(
-              'Please enter verification sent to your mobile phone',
-              style: Theme.of(context).textTheme.bodyText2,
-              textAlign: TextAlign.center,
-            ),
-            SpaceWidget(),
-            OtpWidget(
-              count: fieldsCount,
-              width: otpWidth,
-              fieldWidth: otpFieldWidth,
-              onComplete: (pin) {
-                print(pin);
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          _AppBarWidget(),
+          SizedBox(
+              width: 200.0, height: 200.0, child: Image(image: widget.logo)),
+          SpaceWidget(),
+          Text(
+            'Verification code',
+            style: Theme.of(context).textTheme.headline6,
+            textAlign: TextAlign.center,
+          ),
+          SpaceWidget(
+            space: kDimenSmall,
+          ),
+          Text(
+            'Please enter verification sent to your mobile phone',
+            style: Theme.of(context).textTheme.bodyText2,
+            textAlign: TextAlign.center,
+          ),
+          SpaceWidget(),
+          OtpWidget(
+            count: fieldsCount,
+            width: otpWidth,
+            fieldWidth: otpFieldWidth,
+            onComplete: (pin) =>
+                widget.authProvider.authByPhoneNumber(pin).then((value) {
+              if (value) {
                 widget.onAuthCompleted();
-              },
-            ),
-            SpaceWidget(),
-          ],
-        ),
-      );
+              } else {
+                SnackBarWidget.show(context, 'Invalid verification code');
+              }
+            }),
+          ),
+          SpaceWidget(),
+        ],
+      ),
+    );
   }
 }
 

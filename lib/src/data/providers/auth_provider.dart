@@ -85,7 +85,8 @@ class AuthProvider extends BaseProvider {
     AuthCredential authCredential =
         PhoneAuthProvider.getCredential(verificationId: verID, smsCode: otp);
 
-    return authWithCredential(authCredential);
+    bool result = await authWithCredential(authCredential);
+    return result;
   }
 
   Future<bool> authWithCredential(AuthCredential credential) async {
