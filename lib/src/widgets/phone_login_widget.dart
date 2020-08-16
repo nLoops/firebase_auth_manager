@@ -91,7 +91,7 @@ class _PhoneLoginWidgetState extends State<PhoneLoginWidget> {
       body: Container(
         constraints: BoxConstraints.expand(),
         padding: EdgeInsets.symmetric(horizontal: kDimenNormal),
-        child: buildBody(context),
+        child: SingleChildScrollView(child: buildBody(context)),
       ),
     );
   }
